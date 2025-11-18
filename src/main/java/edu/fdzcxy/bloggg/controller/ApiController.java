@@ -23,7 +23,6 @@ import edu.fdzcxy.bloggg.service.SchedulerService;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:5173")
 public class ApiController {
     private final BookmarkDao bookmarkDao;
     private final SubscriptionDao subscriptionDao;
