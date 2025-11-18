@@ -1,57 +1,130 @@
 <template>
-  <div class="p-6 bg-gray-50 min-h-screen">
-    <h1 class="text-2xl font-bold mb-4">博客导航</h1>
+  <div class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+      <!-- 页面标题 -->
+      <div class="mb-8">
+        <h1 class="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
+          博客导航
+        </h1>
+        <p class="mt-2 text-lg text-slate-600">
+          收藏和管理您喜爱的博客
+        </p>
+      </div>
 
-    <!-- 收藏展示 -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <BookmarkCard
-        v-for="item in bookmarks"
-        :key="item.id"
-        :bookmark="item"
-        @delete="removeBookmark"
-      />
-    </div>
+      <!-- 收藏展示 -->
+      <div v-if="bookmarks.length > 0" class="mb-12">
+        <section class="space-y-10">
+          <article
+            v-for="item in bookmarks"
+            :key="item.id"
+            class="bookmark-entry"
+          >
+            <header class="entry-header flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
+              <div>
+                <h3 class="text-2xl font-semibold text-slate-900">
+                  <a
+                    :href="item.url"
+                    target="_blank"
+                    rel="noopener"
+                    class="hover:text-blue-600 transition-colors entry-link"
+                  >
+                    {{ item.title }}
+                  </a>
+                </h3>
+                <p class="text-base leading-relaxed text-slate-700 break-all entry-url">
+                  {{ item.description }}
+                </p>
+              </div>
+              <button
+                type="button"
+                class="text-sm text-rose-500 hover:text-rose-600 transition-colors"
+                @click="removeBookmark(item.id)"
+              >
+                删除
+              </button>
+            </header>
+            <p v-if="item.description" class="text-sm text-slate-500 entry-body">
+              {{ item.url }}
+            </p>
+            <p v-else class="text-sm text-slate-400 italic entry-body">
+              暂无描述，点击标题访问详情。
+            </p>
+          </article>
+        </section>
+      </div>
 
-    <!-- 添加收藏 -->
-    <div class="mt-6 bg-white p-4 rounded-xl shadow">
-      <h2 class="text-lg font-semibold mb-2">添加收藏</h2>
-      <form @submit.prevent="add" class="space-y-3">
-        <div>
-          <input
-            v-model="title"
-            placeholder="标题"
-            class="border p-2 rounded w-full"
-          />
-        </div>
-        <div>
-          <input
-            v-model="url"
-            placeholder="网址"
-            class="border p-2 rounded w-full"
-          />
-        </div>
-        <div>
-          <textarea
-            v-model="description"
-            placeholder="描述"
-            class="border p-2 rounded w-full"
-            rows="3"
-          ></textarea>
-        </div>
-        <button
-          type="submit"
-          class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        >
-          添加
-        </button>
-      </form>
+      <!-- 空状态 -->
+      <div v-else class="mb-12 text-center py-12">
+        <p class="text-slate-500 text-lg">还没有收藏任何博客，添加一个开始吧！</p>
+      </div>
+
+      <!-- 添加收藏 -->
+      <section class="space-y-6 mt-14">
+        <article class="bookmark-entry">
+          <header class="entry-header flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
+            <div>
+              <h2 class="text-2xl font-semibold text-slate-900">
+                添加收藏
+              </h2>
+              <p class="text-sm text-slate-500">
+                输入信息并保存到上方列表
+              </p>
+            </div>
+          </header>
+          <form @submit.prevent="add" class="entry-body space-y-5">
+            <div>
+              <label for="title" class="block text-sm font-medium text-slate-700 mb-2">
+                标题
+              </label>
+              <input
+                id="title"
+                v-model="title"
+                type="text"
+                placeholder="输入博客标题"
+                class="block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-2 text-base focus:border-blue-500 focus:ring-0"
+              />
+            </div>
+            <div>
+              <label for="url" class="block text-sm font-medium text-slate-700 mb-2">
+                网址
+              </label>
+              <input
+                id="url"
+                v-model="url"
+                type="url"
+                placeholder="https://example.com"
+                class="block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-2 text-base focus:border-blue-500 focus:ring-0"
+              />
+            </div>
+            <div>
+              <label for="description" class="block text-sm font-medium text-slate-700 mb-2">
+                描述
+              </label>
+              <textarea
+                id="description"
+                v-model="description"
+                placeholder="输入博客描述（可选）"
+                rows="4"
+                class="block w-full border border-slate-200 bg-transparent px-3 py-2 text-base rounded-md focus:border-blue-500 focus:ring-0"
+              ></textarea>
+            </div>
+            <div class="pt-2 flex justify-end">
+              <button
+                type="submit"
+                class="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+              >
+                添加收藏
+              </button>
+            </div>
+          </form>
+        </article>
+      </section>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import BookmarkCard from '../components/BookmarkCard.vue';
 import { getBookmarks, addBookmark, deleteBookmark } from '../api/bookmarks';
 
 const bookmarks = ref([]);

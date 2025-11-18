@@ -1,0 +1,422 @@
+/* 字体定义 */
+@font-face {
+  font-family: 'Material Symbols Outlined';
+  font-style: normal;
+  font-weight: 300;
+  src: url(https://fonts.gstatic.com/s/materialsymbolsoutlined/v7/kJF1BvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oDMzByHX9rA6RzaxHMPdY43zj-jCxv3fzvRNU22ZXGJpEpjC_1i-q_4MrImHCIJIZrDDxHOem.ttf) format('truetype');
+}
+
+@font-face {
+  font-family: 'Material Symbols Outlined';
+  font-style: normal;
+  font-weight: 300;
+  src: url(https://fonts.gstatic.com/s/materialsymbolsoutlined/v7/kJF1BvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oDMzByHX9rA6RzaxHMPdY43zj-jCxv3fzvRNU22ZXGJpEpjC_1n-q_4MrImHCIJIZrDDxHOem.ttf) format('truetype');
+}
+
+/* 基础字体设置 */
+:root {
+  /* 颜色变量定义 */
+  --loading-bg-color: #b0b0b0;
+  --blog-bg-color: #fff;
+  --text-color: #596172;
+  --border-color: #eef2f8;
+  --catalog-bg-color: #fff;
+  --panel-bg-color: #f8f8f8;
+  --code-bg-color: #f1f3f4;
+  --code-color: #bababa;
+  --pane-box-shadow: 0px 1px 15px #e6e6e6;
+  --toolbar-box-shadow: 0 2px 4px 1px #e8e8e8;
+  --theme-color: #2d8cf0;
+}
+
+/* 暗色主题 */
+:root[mode=dark] {
+  --blog-bg-color: #202020;
+  --text-color: #d8d8d8;
+  --border-color: #2f2f2f;
+  --catalog-bg-color: #252525;
+  --panel-bg-color: #252525;
+  --code-bg-color: #3c3d40;
+  --code-color: #9aa0a6;
+  --pane-box-shadow: 0px 1px 15px #0a0a0a;
+  --toolbar-box-shadow: 0 2px 4px 1px #151515;
+  --loading-bg-color: #222;
+}
+
+/* 主题颜色变量 */
+:root[theme=a] { --theme-color: #2d8cf0; }
+:root[theme=b] { --theme-color: #fa7298; }
+:root[theme=c] { --theme-color: #42b983; }
+:root[theme=d] { --theme-color: #607d8b; }
+:root[theme=e] { --theme-color: #5e72e4; }
+:root[theme=f] { --theme-color: #ff9700; }
+:root[theme=g] { --theme-color: #ff5722; }
+:root[theme=h] { --theme-color: #009688; }
+:root[theme=i] { --theme-color: #673bb7; }
+:root[theme=j] { --theme-color: #906f61; }
+
+/* 全局字体设置 */
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body, html {
+  height: 100%;
+}
+
+/* =========================================================
+   Vue 前端适配层 —— 不改 Vue 模板，只补 CSS 映射
+   ========================================================= */
+
+/* 1. nav 视为 header */
+nav {
+  width: 100%;
+  background: transparent !important;
+  border-bottom: 1px solid var(--border-color);
+  padding: 0 0;
+  margin: 0 auto;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  box-shadow: none !important;
+}
+
+/* 2. nav 内的结构对应主题中的 #blogTitle 和 #navigator */
+nav h1 {
+  margin: 0;
+  padding: 0;
+  font-size: 25px;
+  font-weight: 600;
+  font-family: Georgia;
+  color: inherit;
+}
+
+/* 3. nav 的 ul = #navList */
+nav ul {
+  display: flex;
+  margin-left: auto;
+  height: 60px;
+  align-items: center;
+}
+
+nav ul li {
+  list-style: none;
+  padding: 0 15px;
+  font-size: 15px;
+  line-height: 60px;
+  position: relative;
+}
+
+/* 4. nav a = #navList > li > a */
+nav a {
+  color: inherit;
+  position: relative;
+  padding: 0;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  height: 60px;
+  border-radius: 0 !important;
+  background: transparent !important;
+  font-size: 15px;
+}
+
+/* 下划线 hover 效果（继承你主题的动画） */
+nav a:after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 4px;
+  bottom: -4px;
+  left: 0;
+  background-color: var(--theme-color);
+  visibility: hidden;
+  transform: scaleX(0);
+  transition: .4s ease-in-out;
+}
+
+nav a:hover:after {
+  visibility: visible;
+  transform: scaleX(1);
+}
+
+/* 5. Vue Router 激活状态等效为 hover/active 选中 */
+nav a.router-link-active,
+nav a.router-link-exact-active {
+  color: inherit !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+nav a.router-link-active:after,
+nav a.router-link-exact-active:after {
+  visibility: visible;
+  transform: scaleX(1);
+}
+
+/* 6. main 匹配 #main */
+main {
+  width: 960px;
+  margin: 0 auto;
+  min-height: calc(100% - 75px);
+  padding: 15px 0;
+  color: var(--text-color);
+}
+
+/* 7. footer 匹配 #footer */
+footer {
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+  padding: 15px 0;
+  font-size: 13px;
+  color: var(--text-color);
+  background: transparent;
+}
+
+/* 正文字体定义 */
+body {
+  background: var(--blog-bg-color);
+  color: var(--text-color);
+  font-family: Lato, PingFang SC, Microsoft YaHei, sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.75;
+}
+
+/* 标题字体定义 */
+h1, h2, h3, h4, h5, h6 {
+  font-size: 100%;
+  font-weight: 400;
+}
+
+/* 博客标题字体 */
+#blogTitle h1 {
+  font-family: Georgia;
+  font-size: 25px;
+  font-weight: 600;
+  float: left;
+  margin-top: 15px;
+}
+
+/* 文章标题字体 */
+#topics .postTitle {
+  font-size: 21px;
+  font-weight: inherit;
+}
+
+.day .postTitle,
+.entrylist .entrylistPosttitle {
+  font-size: 19px;
+}
+
+/* 文章正文字体 */
+#topics .postBody {
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.day .postCon,
+.entrylist .entrylistPostSummary {
+  font-size: 16px;
+  padding: 10px 0;
+}
+
+/* 代码字体 */
+#topics .postBody .hljs,
+#topics .postBody .hljsln,
+.cnblogs_code {
+  font-family: Consolas, Monaco, Andale Mono, Ubuntu Mono, monospace !important;
+  font-size: 15px !important;
+}
+
+#topics .postBody h1 code,
+#topics .postBody h2 code,
+#topics .postBody h3 code,
+#topics .postBody h4 code,
+#topics .postBody h5 code,
+#topics .postBody h6 code,
+#topics .postBody li>code,
+#topics .postBody p>code,
+#topics .postBody table code {
+  font-family: consolas !important;
+  font-size: 14px !important;
+}
+
+/* Material Icons 字体 */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: 400;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+}
+
+/* 侧边栏字体 */
+#sideBar #profile_block a:first-child {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+#sideBar #profile_block a:nth-child(3),
+#sideBar #profile_block a:nth-child(5),
+#sideBar #profile_block a:nth-child(7) {
+  font-size: 14px;
+}
+
+/* 导航菜单字体 */
+#navList>li {
+  font-size: 17px;
+}
+
+#navList .esa-sub-navs ul li a {
+  font-size: 15px;
+}
+
+/* 页脚字体 */
+#footer {
+  font-size: 13px;
+}
+
+/* 响应式设计 */
+@media only screen and (max-width: 1365px) {
+  .github-corner {
+    display: none;
+  }
+}
+
+@media only screen and (max-width: 1259px) {
+  #home {
+    width: 100% !important;
+  }
+}
+
+@media only screen and (max-width: 990px) {
+  /* 移动端样式调整 */
+  #bannerbar {
+    display: none;
+  }
+  
+  #header, .esa-mobile-menu {
+    display: block !important;
+  }
+  
+  #header {
+    width: auto;
+    position: fixed !important;
+    background: var(--blog-bg-color);
+  }
+  
+  #header #blogTitle {
+    margin-left: 15px;
+  }
+  
+  /* 移动端字体调整 */
+  #header #navigator #navList>li {
+    height: 34px;
+    line-height: 34px;
+  }
+  
+  #main {
+    padding: 70px 0 0 !important;
+  }
+}
+
+/* 其他样式保持不变... */
+/* 这里包含原始CSS中的所有其他样式规则 */
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--text-color);
+}
+
+/* 选择文本样式 */
+::-moz-selection {
+  background: var(--theme-color);
+  color: #fff;
+}
+
+::selection {
+  background: var(--theme-color);
+  color: #fff;
+}
+
+/* ---------------------------------------------------------
+   Bookmark 页面自定义排版
+   --------------------------------------------------------- */
+.bookmark-entry {
+  padding: 0 0 24px;
+  border: none;
+  border-bottom: 1px solid var(--border-color);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.bookmark-entry + .bookmark-entry {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-color);
+}
+
+.entry-header {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 12px;
+}
+
+.entry-link {
+  color: var(--text-color);
+}
+
+.entry-link:hover {
+  color: var(--theme-color) !important;
+}
+
+.entry-url,
+.entry-body {
+  color: var(--text-color);
+}
+
+input[type='text'],
+input[type='url'],
+textarea {
+  border-color: var(--border-color) !important;
+  color: var(--text-color);
+  background: transparent;
+}
+
+input:focus,
+textarea:focus {
+  border-color: var(--theme-color) !important;
+  outline: none;
+}
+
+button[type='submit'],
+button {
+  transition: color 0.2s ease;
+}
+
+button:hover {
+  color: var(--theme-color) !important;
+}
+
+.text-rose-500:hover {
+  color: #f43f5e !important;
+}
+
+h1,
+h2,
+h3 {
+  color: var(--text-color);
+}

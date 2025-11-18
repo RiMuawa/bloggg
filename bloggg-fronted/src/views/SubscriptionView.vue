@@ -1,31 +1,135 @@
 <template>
-  <div class="p-6 bg-gray-50 min-h-screen">
-    <h1 class="text-2xl font-bold mb-4">订阅管理</h1>
-
-    <div class="bg-white p-4 rounded-xl shadow mb-6">
-      <h2 class="text-lg font-semibold mb-2">添加订阅</h2>
-      <form @submit.prevent="add">
-        <input v-model="url" placeholder="博客地址" class="border p-2 rounded mr-2 w-1/3" />
-        <input v-model="email" placeholder="通知邮箱" class="border p-2 rounded mr-2 w-1/3" />
-        <input v-model.number="period" type="number" placeholder="周期(小时)" class="border p-2 rounded mr-2 w-24" />
-        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">添加订阅</button>
-      </form>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div v-for="sub in subscriptions" :key="sub.id" class="bg-white p-4 rounded-xl shadow">
-        <h3 class="text-lg font-semibold">{{ sub.url }}</h3>
-        <p class="text-sm text-gray-500">通知邮箱：{{ sub.notify_email }}</p>
-        <p class="text-sm text-gray-500">周期：{{ sub.period_hours }} 小时</p>
-        <div class="flex items-center gap-3 mt-2">
-          <button @click="remove(sub.id)" class="text-sm text-red-500">取消订阅</button>
-          <button @click="checkNow(sub.id)" class="text-sm text-blue-600">立即检测</button>
-        </div>
-        <p v-if="results[sub.id]" class="text-xs mt-2" :class="results[sub.id].success ? 'text-green-600' : 'text-gray-600'">
-          {{ results[sub.id].message }}
+  <div class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+      <!-- 页面标题 -->
+      <div class="mb-8">
+        <h1 class="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
+          订阅管理
+        </h1>
+        <p class="mt-2 text-lg text-slate-600">
+          订阅博客并接收更新通知
         </p>
       </div>
+       <!-- 订阅列表 -->
+       <div v-if="subscriptions.length > 0">
+        <section class="space-y-10">
+          <article
+            v-for="sub in subscriptions"
+            :key="sub.id"
+            class="bookmark-entry"
+          >
+            <header class="entry-header flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
+              <div>
+                <h3 class="text-2xl font-semibold text-slate-900 break-words">
+                  {{ sub.url }}
+                </h3>
+                <p class="text-sm text-slate-500">
+                  每 {{ sub.period_hours }} 小时检测一次 · 通知 {{ sub.notify_email }}
+                </p>
+              </div>
+              <div class="flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  class="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                  @click="checkNow(sub.id)"
+                >
+                  立即检测
+                </button>
+                <button
+                  type="button"
+                  class="text-sm font-medium text-rose-500 hover:text-rose-600 transition-colors"
+                  @click="remove(sub.id)"
+                >
+                  取消订阅
+                </button>
+              </div>
+            </header>
+            <dl class="entry-body text-sm text-slate-600 space-y-2">
+              <div v-if="results[sub.id]">
+                <p :class="results[sub.id].success ? 'text-green-600' : 'text-red-600'">
+                  {{ results[sub.id].message }}
+                </p>
+              </div>
+              <div v-else class="text-slate-400">
+                最近暂无检测结果
+              </div>
+            </dl>
+          </article>
+        </section>
+      </div>
+
+      <!-- 空状态 -->
+      <div v-else class="text-center py-12 text-slate-500">
+        <p class="text-lg">还没有订阅任何博客，添加一个开始吧！</p>
+      </div>
     </div>
+
+      <!-- 添加订阅表单 -->
+      <section class="space-y-6 mb-12">
+        <article class="bookmark-entry">
+          <header class="entry-header flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
+            <div>
+              <h2 class="text-2xl font-semibold text-slate-900">
+                添加订阅
+              </h2>
+              <p class="text-sm text-slate-500">
+                填写订阅信息，系统将按周期检测更新
+              </p>
+            </div>
+          </header>
+          <form @submit.prevent="add" class="entry-body space-y-5">
+            <div>
+              <label for="url" class="block text-sm font-medium text-slate-700 mb-2">
+                博客地址
+              </label>
+              <input
+                id="url"
+                v-model="url"
+                type="url"
+                placeholder="https://example.com"
+                class="block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-2 text-base focus:border-blue-500 focus:ring-0"
+              />
+            </div>
+            <div class="grid gap-5 sm:grid-cols-2">
+              <div>
+                <label for="email" class="block text-sm font-medium text-slate-700 mb-2">
+                  通知邮箱
+                </label>
+                <input
+                  id="email"
+                  v-model="email"
+                  type="email"
+                  placeholder="your@email.com"
+                  class="block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-2 text-base focus:border-blue-500 focus:ring-0"
+                />
+              </div>
+              <div>
+                <label for="period" class="block text-sm font-medium text-slate-700 mb-2">
+                  检测周期（小时）
+                </label>
+                <input
+                  id="period"
+                  v-model.number="period"
+                  type="number"
+                  min="1"
+                  placeholder="24"
+                  class="block w-full border-0 border-b border-slate-200 bg-transparent px-0 py-2 text-base focus:border-blue-500 focus:ring-0"
+                />
+              </div>
+            </div>
+            <div class="pt-2 flex justify-end">
+              <button
+                type="submit"
+                class="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+              >
+                添加订阅
+              </button>
+            </div>
+          </form>
+        </article>
+      </section>
+
+     
   </div>
 </template>
 
