@@ -32,5 +32,9 @@ public class Subscription {
 
     @JsonProperty("last_content_hash")
     private String lastContentHash;
+
+    @JsonProperty("icon")
+    private byte[] icon;
+
     // getters/setters
 }
