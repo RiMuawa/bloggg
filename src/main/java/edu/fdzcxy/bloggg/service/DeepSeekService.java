@@ -72,14 +72,22 @@ public class DeepSeekService {
      * @return 总结结果，如果失败返回 null
      */
     public String summarize(String content) {
+        System.out.println("[DeepSeek] ========== 开始 DeepSeek API 调用 ==========");
+        
         if (apiKey == null || apiKey.isBlank()) {
-            System.out.println("警告: DeepSeek API Key 未配置，跳过总结");
+            System.out.println("[DeepSeek] 警告: DeepSeek API Key 未配置，跳过总结");
             return null;
         }
 
         if (content == null || content.isBlank()) {
+            System.out.println("[DeepSeek] 警告: 内容为空，跳过总结");
             return null;
         }
+
+        System.out.println("[DeepSeek] API URL: " + apiUrl);
+        System.out.println("[DeepSeek] 请求内容长度: " + content.length() + " 字符");
+        System.out.println("[DeepSeek] 请求内容预览: " + 
+            (content.length() > 300 ? content.substring(0, 300) + "..." : content));
 
         try {
             // 构建请求体
@@ -97,12 +105,17 @@ public class DeepSeekService {
             requestBody.put("messages", List.of(systemMessage, userMessage));
             requestBody.put("temperature", 0.7);
 
+            System.out.println("[DeepSeek] 请求体构建完成，模型: deepseek-chat");
+
             // 设置请求头
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.setBearerAuth(apiKey);
 
             HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
+
+            System.out.println("[DeepSeek] 正在发送请求到 DeepSeek API...");
+            long startTime = System.currentTimeMillis();
 
             // 发送请求
             ResponseEntity<DeepSeekResponse> response = restTemplate.exchange(
@@ -112,21 +125,30 @@ public class DeepSeekService {
                     DeepSeekResponse.class
             );
 
+            long endTime = System.currentTimeMillis();
+            System.out.println("[DeepSeek] API 响应接收完成，耗时: " + (endTime - startTime) + " ms");
+            System.out.println("[DeepSeek] HTTP 状态码: " + response.getStatusCode());
+
             if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
                 DeepSeekResponse body = response.getBody();
                 if (body != null && body.choices != null && !body.choices.isEmpty()) {
                     Choice firstChoice = body.choices.get(0);
                     if (firstChoice != null && firstChoice.message != null && firstChoice.message.content != null) {
-                        return firstChoice.message.content.trim();
+                        String result = firstChoice.message.content.trim();
+                        System.out.println("[DeepSeek] API 调用成功，返回总结长度: " + result.length() + " 字符");
+                        System.out.println("[DeepSeek] ========== DeepSeek API 调用完成 ==========");
+                        return result;
                     }
                 }
             }
 
-            System.out.println("DeepSeek API 响应异常: " + response.getStatusCode());
+            System.out.println("[DeepSeek] API 响应异常: " + response.getStatusCode());
+            System.out.println("[DeepSeek] ========== DeepSeek API 调用失败 ==========");
             return null;
         } catch (RestClientException e) {
-            System.err.println("调用 DeepSeek API 失败: " + e.getMessage());
+            System.err.println("[DeepSeek] 调用 DeepSeek API 失败: " + e.getMessage());
             e.printStackTrace();
+            System.out.println("[DeepSeek] ========== DeepSeek API 调用异常 ==========");
             return null;
         }
     }

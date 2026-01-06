@@ -27,7 +27,7 @@ public class SchedulerService {
     @Value("${app.notify.subject:博客管管提醒您：}")
     private String notifySubject;
 
-    @Value("${app.notify.body:您订阅的博客[博客地址]  更新啦！}")
+    @Value("${app.notify.body:您订阅的博客[博客地址]更新啦！}")
     private String notifyBody;
 
     public SchedulerService(
@@ -102,14 +102,42 @@ public class SchedulerService {
 
             // ✅ 内容有更新
             if (!prevHash.equals(res.contentHash)) {
+                System.out.println("[更新检测] 检测到内容更新 - 订阅ID: " + s.getId() + ", URL: " + s.getUrl());
+                
                 ContentSummary previousSummary = contentSummaryDao.findByContentHash(prevHash);
                 String previousContent = previousSummary != null ? previousSummary.getRawContent() : null;
 
                 htmlDiffService.printDiff(previousContent, res.content);
 
-                String summary = (res.content != null && !res.content.isBlank())
-                        ? deepSeekService.summarize(res.content)
+                // 提取新增的内容
+                String addedContent = htmlDiffService.extractAddedContent(previousContent, res.content);
+                
+                if (addedContent != null && !addedContent.isBlank()) {
+                    System.out.println("[更新检测] 提取到新增内容，长度: " + addedContent.length() + " 字符");
+                    System.out.println("[更新检测] 新增内容预览: " + 
+                        (addedContent.length() > 200 ? addedContent.substring(0, 200) + "..." : addedContent));
+                } else {
+                    System.out.println("[更新检测] 未提取到新增内容，将使用整个内容进行总结");
+                }
+                
+                // 使用新增的内容进行总结，如果没有新增内容则使用整个内容
+                String contentToSummarize = (addedContent != null && !addedContent.isBlank()) 
+                        ? addedContent 
+                        : res.content;
+                
+                System.out.println("[DeepSeek] 开始调用 DeepSeek API 进行内容总结...");
+                System.out.println("[DeepSeek] 待总结内容长度: " + contentToSummarize.length() + " 字符");
+                
+                String summary = (contentToSummarize != null && !contentToSummarize.isBlank())
+                        ? deepSeekService.summarize(contentToSummarize)
                         : null;
+                
+                if (summary != null && !summary.isBlank()) {
+                    System.out.println("[DeepSeek] 总结完成，总结长度: " + summary.length() + " 字符");
+                    System.out.println("[DeepSeek] 总结内容: " + summary);
+                } else {
+                    System.out.println("[DeepSeek] 总结失败或返回为空");
+                }
 
                 ContentSummary contentSummary = new ContentSummary();
                 contentSummary.setSubscriptionId(s.getId());
@@ -121,7 +149,9 @@ public class SchedulerService {
 
                 String subject = notifySubject;
                 String body = notifyBody.replace("[博客地址]", s.getUrl());
-                notificationService.sendUpdateEmail(s.getNotifyEmail(), subject, body);
+                System.out.println("[邮件通知] 准备发送更新通知邮件到: " + s.getNotifyEmail());
+                notificationService.sendUpdateEmail(s.getNotifyEmail(), subject, body, addedContent, summary);
+                System.out.println("[邮件通知] 邮件发送完成");
 
                 s.setLastContentHash(res.contentHash);
                 subscriptionDao.update(s);
@@ -186,14 +216,42 @@ public class SchedulerService {
                     s.setLastContentHash(res.contentHash);
                     subscriptionDao.update(s);
                 } else if (!prevHash.equals(res.contentHash)) {
+                    System.out.println("[更新检测] 检测到内容更新 - 订阅ID: " + s.getId() + ", URL: " + s.getUrl());
+                    
                     ContentSummary previousSummary = contentSummaryDao.findByContentHash(prevHash);
                     String previousContent = previousSummary != null ? previousSummary.getRawContent() : null;
 
                     htmlDiffService.printDiff(previousContent, res.content);
 
-                    String summary = (res.content != null && !res.content.isBlank())
-                            ? deepSeekService.summarize(res.content)
+                    // 提取新增的内容
+                    String addedContent = htmlDiffService.extractAddedContent(previousContent, res.content);
+                    
+                    if (addedContent != null && !addedContent.isBlank()) {
+                        System.out.println("[更新检测] 提取到新增内容，长度: " + addedContent.length() + " 字符");
+                        System.out.println("[更新检测] 新增内容预览: " + 
+                            (addedContent.length() > 200 ? addedContent.substring(0, 200) + "..." : addedContent));
+                    } else {
+                        System.out.println("[更新检测] 未提取到新增内容，将使用整个内容进行总结");
+                    }
+                    
+                    // 使用新增的内容进行总结，如果没有新增内容则使用整个内容
+                    String contentToSummarize = (addedContent != null && !addedContent.isBlank()) 
+                            ? addedContent 
+                            : res.content;
+                    
+                    System.out.println("[DeepSeek] 开始调用 DeepSeek API 进行内容总结...");
+                    System.out.println("[DeepSeek] 待总结内容长度: " + contentToSummarize.length() + " 字符");
+                    
+                    String summary = (contentToSummarize != null && !contentToSummarize.isBlank())
+                            ? deepSeekService.summarize(contentToSummarize)
                             : null;
+                    
+                    if (summary != null && !summary.isBlank()) {
+                        System.out.println("[DeepSeek] 总结完成，总结长度: " + summary.length() + " 字符");
+                        System.out.println("[DeepSeek] 总结内容: " + summary);
+                    } else {
+                        System.out.println("[DeepSeek] 总结失败或返回为空");
+                    }
 
                     ContentSummary contentSummary = new ContentSummary();
                     contentSummary.setSubscriptionId(s.getId());
@@ -205,7 +263,9 @@ public class SchedulerService {
 
                     String subject = notifySubject;
                     String body = notifyBody.replace("[博客地址]", s.getUrl());
-                    notificationService.sendUpdateEmail(s.getNotifyEmail(), subject, body);
+                    System.out.println("[邮件通知] 准备发送更新通知邮件到: " + s.getNotifyEmail());
+                    notificationService.sendUpdateEmail(s.getNotifyEmail(), subject, body, addedContent, summary);
+                    System.out.println("[邮件通知] 邮件发送完成");
 
                     s.setLastContentHash(res.contentHash);
                     subscriptionDao.update(s);

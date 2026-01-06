@@ -53,8 +53,15 @@
                 </div>
 
                 <div class="flex-1 min-w-0">
-                  <h3 class="text-2xl font-semibold text-slate-900 break-words">
-                    {{ sub.url }}
+                  <h3 class="text-2xl font-semibold break-words">
+                    <a
+                      :href="sub.url"
+                      target="_blank"
+                      rel="noopener"
+                      class="text-blue-600 hover:text-blue-700 transition-colors"
+                    >
+                      {{ sub.url }}
+                    </a>
                   </h3>
                   <p class="text-sm text-slate-500">
                     每 {{ sub.period_hours }} 小时检测一次 ·<br />通知邮箱:
@@ -132,7 +139,7 @@
           <div class="grid gap-5 sm:grid-cols-2">
             <div>
               <label for="email" class="block text-sm font-medium text-slate-700 mb-2">
-                通知邮箱
+                通知邮箱 & 
               </label>
               <input
                 id="email"

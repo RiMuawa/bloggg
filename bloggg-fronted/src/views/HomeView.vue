@@ -46,7 +46,7 @@
                       :href="item.url"
                       target="_blank"
                       rel="noopener"
-                      class="hover:text-blue-600 transition-colors entry-link"
+                      class="text-blue-600 hover:text-blue-700 transition-colors entry-link"
                     >
                       {{ item.title }}
                     </a>
@@ -65,7 +65,14 @@
               </button>
             </header>
             <p v-if="item.description" class="text-sm text-slate-500 entry-body">
-              {{ item.url }}
+              <a
+                :href="item.url"
+                target="_blank"
+                rel="noopener"
+                class="text-blue-600 hover:text-blue-700 transition-colors"
+              >
+                {{ item.url }}
+              </a>
             </p>
             <p v-else class="text-sm text-slate-400 italic entry-body">
               暂无描述，点击标题访问详情。
